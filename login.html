@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | Raymond Okinyi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="login-body">
+
+  <div class="login-bg">
+    <div class="login-blob b1"></div>
+    <div class="login-blob b2"></div>
+  </div>
+
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="brand-initials">RO</span>
+    </div>
+    <h1>Admin Panel</h1>
+    <p class="login-sub">Raymond Okinyi — Secure Access</p>
+
+    <!-- Lock overlay after too many attempts -->
+    <div class="lockout-banner" id="lockout-banner" style="display:none;">
+      <i class="fas fa-lock"></i>
+      <span id="lockout-msg">Too many failed attempts. Try again in <strong id="countdown">30</strong>s</span>
+    </div>
+
+    <form id="login-form" autocomplete="off" novalidate>
+      <div class="form-group">
+        <label for="username"><i class="fas fa-user"></i> Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter username"
+               autocomplete="off" required />
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <div class="password-wrap">
+          <input type="password" id="password" name="password" placeholder="Enter password"
+                 autocomplete="off" required />
+          <button type="button" class="toggle-pw" id="toggle-pw" aria-label="Show password">
+            <i class="fas fa-eye" id="eye-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group remember-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember" />
+          <span>Remember me</span>
+        </label>
+      </div>
+
+      <div class="login-error" id="login-error" style="display:none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="error-msg">Invalid username or password.</span>
+      </div>
+
+      <button type="submit" class="btn-login" id="login-btn">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+    </form>
+
+    <a href="../index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to website
+    </a>
+
+    <!-- Reset lockout helper -->
+    <a href="#" class="back-link" id="reset-lock" style="margin-top:8px;font-size:0.75rem;opacity:0.5;">
+      <i class="fas fa-rotate-right"></i> Clear login session
+    </a>
+  </div>
+
+  <script src="admin.js"></script>
+  <script>
+    // ---- Login logic ----
+    const ADMIN_USER = 'raymond';
+    const ADMIN_PASS = 'raymond123';   // ← change this to your preferred password
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_SECS = 30;
+
+    const form      = document.getElementById('login-form');
+    const errBox    = document.getElementById('login-error');
+    const errMsg    = document.getElementById('error-msg');
+    const lockBanner= document.getElementById('lockout-banner');
+    const countEl   = document.getElementById('countdown');
+    const loginBtn  = document.getElementById('login-btn');
+    const togglePw  = document.getElementById('toggle-pw');
+    const pwInput   = document.getElementById('password');
+    const eyeIcon   = document.getElementById('eye-icon');
+    const remember  = document.getElementById('remember');
+
+    let attempts = parseInt(sessionStorage.getItem('loginAttempts') || '0');
+    let lockedUntil = parseInt(sessionStorage.getItem('lockedUntil') || '0');
+
+    function checkLock() {
+      const now = Date.now();
+      if (lockedUntil > now) {
+        startLockoutUI(Math.ceil((lockedUntil - now) / 1000));
+        return true;
+      }
+      return false;
+    }
+
+    function startLockoutUI(secs) {
+      lockBanner.style.display = 'flex';
+      loginBtn.disabled = true;
+      let remaining = secs;
+      countEl.textContent = remaining;
+      const interval = setInterval(() => {
+        remaining--;
+        countEl.textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          lockBanner.style.display = 'none';
+          loginBtn.disabled = false;
+          attempts = 0;
+          sessionStorage.removeItem('loginAttempts');
+          sessionStorage.removeItem('lockedUntil');
+        }
+      }, 1000);
+    }
+
+    // Auto-fill remembered username
+    const saved = localStorage.getItem('adminUser');
+    if (saved) {
+      document.getElementById('username').value = saved;
+      remember.checked = true;
+    }
+
+    // Show/hide password
+    togglePw.addEventListener('click', () => {
+      const show = pwInput.type === 'password';
+      pwInput.type = show ? 'text' : 'password';
+      eyeIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    checkLock();
+
+    // Also check if a custom password was saved via dashboard
+    function getActivePass() {
+      return localStorage.getItem('adminPassword') || 'raymond123';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (checkLock()) return;
+
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+
+      if (user === ADMIN_USER && pass === getActivePass()) {
+        // Success
+        sessionStorage.setItem('adminAuth', 'true');
+        sessionStorage.setItem('adminName', 'Raymond');
+        sessionStorage.removeItem('loginAttempts');
+        sessionStorage.removeItem('lockedUntil');
+        if (remember.checked) {
+          localStorage.setItem('adminUser', user);
+        } else {
+          localStorage.removeItem('adminUser');
+        }
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      } else {
+        attempts++;
+        sessionStorage.setItem('loginAttempts', attempts);
+        errBox.style.display = 'flex';
+        const left = MAX_ATTEMPTS - attempts;
+        if (attempts >= MAX_ATTEMPTS) {
+          const until = Date.now() + LOCKOUT_SECS * 1000;
+          sessionStorage.setItem('lockedUntil', until);
+          lockedUntil = until;
+          startLockoutUI(LOCKOUT_SECS);
+          errMsg.textContent = 'Account locked due to too many attempts.';
+        } else {
+          errMsg.textContent = `Invalid credentials. ${left} attempt${left !== 1 ? 's' : ''} remaining.`;
+        }
+        // Shake animation
+        form.classList.add('shake');
+        setTimeout(() => form.classList.remove('shake'), 500);
+      }
+    });
+    // Reset lockout link
+    document.getElementById('reset-lock').addEventListener('click', (e) => {
+      e.preventDefault();
+      sessionStorage.removeItem('loginAttempts');
+      sessionStorage.removeItem('lockedUntil');
+      localStorage.removeItem('adminPassword');
+      attempts = 0;
+      lockedUntil = 0;
+      lockBanner.style.display = 'none';
+      loginBtn.disabled = false;
+      errBox.style.display = 'none';
+      alert('Session cleared. Try logging in again with the default password.');
+    });
+  </script>
+</body>
+</html>

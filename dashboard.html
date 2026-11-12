@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Raymond Okinyi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-initials">RO</span>
+      <div>
+        <h2>Admin Panel</h2>
+        <small>Raymond Okinyi</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-tab="overview">
+        <i class="fas fa-tachometer-alt"></i> Overview
+      </a>
+      <a href="#" class="nav-item" data-tab="messages">
+        <i class="fas fa-envelope"></i> Messages
+        <span class="badge" id="msg-badge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="profile">
+        <i class="fas fa-user-edit"></i> Edit Profile
+      </a>
+      <a href="#" class="nav-item" data-tab="skills">
+        <i class="fas fa-code"></i> Skills
+      </a>
+      <a href="#" class="nav-item" data-tab="projects">
+        <i class="fas fa-project-diagram"></i> Projects
+      </a>
+      <a href="#" class="nav-item" data-tab="password">
+        <i class="fas fa-key"></i> Change Password
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="../index.html" class="nav-item">
+        <i class="fas fa-external-link-alt"></i> View Site
+      </a>
+      <a href="#" class="nav-item logout" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="dash-main">
+
+    <!-- Top bar -->
+    <header class="dash-header">
+      <button class="sidebar-toggle" id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="dash-header-right">
+        <div class="notif-bell" id="notif-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notif-dot" id="notif-dot" style="display:none;"></span>
+        </div>
+        <div class="admin-avatar">
+          <span>RO</span>
+        </div>
+        <span class="admin-name" id="admin-name">Raymond</span>
+      </div>
+    </header>
+
+    <!-- ===== OVERVIEW TAB ===== -->
+    <section class="tab-content active" id="tab-overview">
+      <h1 class="page-title">Dashboard Overview</h1>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-icon blue"><i class="fas fa-envelope"></i></div>
+          <div>
+            <h3 id="stat-total">0</h3>
+            <p>Total Messages</p>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon green"><i class="fas fa-envelope-open"></i></div>
+          <div>
+            <h3 id="stat-unread">0</h3>
+            <p>Unread Messages</p>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon purple"><i class="fas fa-project-diagram"></i></div>
+          <div>
+            <h3 id="stat-projects">3</h3>
+            <p>Projects Listed</p>
+          </div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-icon orange"><i class="fas fa-code"></i></div>
+          <div>
+            <h3 id="stat-skills">16</h3>
+            <p>Skills Listed</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent messages preview -->
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-envelope"></i> Recent Messages</h2>
+          <button class="btn-sm" onclick="switchTab('messages')">View All</button>
+        </div>
+        <div id="recent-messages">
+          <p class="empty-state"><i class="fas fa-inbox"></i> No messages yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MESSAGES TAB ===== -->
+    <section class="tab-content" id="tab-messages">
+      <h1 class="page-title">Messages Inbox</h1>
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-inbox"></i> All Messages</h2>
+          <button class="btn-sm btn-danger" id="clear-all-btn">
+            <i class="fas fa-trash"></i> Clear All
+          </button>
+        </div>
+        <div class="message-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="unread">Unread</button>
+          <button class="filter-btn" data-filter="read">Read</button>
+        </div>
+        <div id="message-list">
+          <p class="empty-state"><i class="fas fa-inbox"></i> No messages yet.</p>
+        </div>
+      </div>
+
+      <!-- Message Detail Panel -->
+      <div class="message-detail" id="message-detail" style="display:none;">
+        <div class="dash-card">
+          <div class="card-header">
+            <h2 id="detail-subject">Message</h2>
+            <button class="btn-sm" id="close-detail"><i class="fas fa-times"></i> Close</button>
+          </div>
+          <div class="detail-meta">
+            <span><i class="fas fa-user"></i> <strong id="detail-name"></strong></span>
+            <span><i class="fas fa-envelope"></i> <strong id="detail-email"></strong></span>
+            <span><i class="fas fa-clock"></i> <strong id="detail-time"></strong></span>
+          </div>
+          <div class="detail-body" id="detail-body"></div>
+          <div class="detail-actions">
+            <a id="reply-btn" href="#" class="btn-primary-sm">
+              <i class="fas fa-reply"></i> Reply via Email
+            </a>
+            <button id="delete-msg-btn" class="btn-danger-sm">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EDIT PROFILE TAB ===== -->
+    <section class="tab-content" id="tab-profile">
+      <h1 class="page-title">Edit Profile</h1>
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-user-edit"></i> Personal Information</h2>
+          <span class="saved-badge" id="profile-saved" style="display:none;">
+            <i class="fas fa-check"></i> Saved
+          </span>
+        </div>
+        <form id="profile-form" class="admin-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="p-name" value="Raymond Okinyi" />
+            </div>
+            <div class="form-group">
+              <label>Job Title</label>
+              <input type="text" id="p-title" value="Computer Science Student & IT Enthusiast" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="p-email" value="raymondopiyo@gmail.com" />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" id="p-phone" value="0795 058 238" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="p-location" value="Kenya" />
+            </div>
+            <div class="form-group">
+              <label>Languages</label>
+              <input type="text" id="p-languages" value="English, Swahili" />
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>About Me (Bio)</label>
+            <textarea id="p-bio" rows="4">I am a dedicated Computer Science student at NYS Engineering Institute, driven by a deep passion for information technology, networking, and practical problem-solving.</textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>LinkedIn URL</label>
+              <input type="url" id="p-linkedin" placeholder="https://linkedin.com/in/yourprofile" />
+            </div>
+            <div class="form-group">
+              <label>GitHub URL</label>
+              <input type="url" id="p-github" placeholder="https://github.com/yourusername" />
+            </div>
+          </div>
+          <button type="submit" class="btn-save">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== SKILLS TAB ===== -->
+    <section class="tab-content" id="tab-skills">
+      <h1 class="page-title">Manage Skills</h1>
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-plus-circle"></i> Add New Skill</h2>
+        </div>
+        <form id="skill-form" class="admin-form inline-form">
+          <div class="form-group">
+            <label>Skill Name</label>
+            <input type="text" id="skill-name" placeholder="e.g. Python" required />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="skill-cat">
+              <option>Programming & Development</option>
+              <option>Networking & Infrastructure</option>
+              <option>Operating Systems & Hardware</option>
+              <option>Data & Systems</option>
+              <option>Soft Skills</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Level (%)</label>
+            <input type="number" id="skill-level" min="10" max="100" placeholder="75" required />
+          </div>
+          <button type="submit" class="btn-save">
+            <i class="fas fa-plus"></i> Add Skill
+          </button>
+        </form>
+      </div>
+
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-list"></i> Current Skills</h2>
+        </div>
+        <div id="skills-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== PROJECTS TAB ===== -->
+    <section class="tab-content" id="tab-projects">
+      <h1 class="page-title">Manage Projects</h1>
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-plus-circle"></i> Add New Project</h2>
+        </div>
+        <form id="project-form" class="admin-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Project Title</label>
+              <input type="text" id="proj-title" placeholder="Project name" required />
+            </div>
+            <div class="form-group">
+              <label>Icon (Font Awesome class)</label>
+              <input type="text" id="proj-icon" placeholder="fas fa-laptop-code" />
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea id="proj-desc" rows="3" placeholder="What did you do in this project?" required></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>Technologies Used (comma separated)</label>
+            <input type="text" id="proj-tech" placeholder="Python, Linux, Networking" />
+          </div>
+          <button type="submit" class="btn-save">
+            <i class="fas fa-plus"></i> Add Project
+          </button>
+        </form>
+      </div>
+
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-list"></i> Current Projects</h2>
+        </div>
+        <div id="projects-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== CHANGE PASSWORD TAB ===== -->
+    <section class="tab-content" id="tab-password">
+      <h1 class="page-title">Change Password</h1>
+      <div class="dash-card" style="max-width:500px;">
+        <div class="card-header">
+          <h2><i class="fas fa-key"></i> Update Password</h2>
+        </div>
+        <form id="password-form" class="admin-form" novalidate>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="cur-pass" placeholder="Current password" required />
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="new-pass" placeholder="Min 8 chars, 1 upper, 1 number" required />
+            <div class="pw-strength" id="pw-strength"></div>
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirm-pass" placeholder="Repeat new password" required />
+          </div>
+          <div class="form-error" id="pw-error" style="display:none;"></div>
+          <div class="form-success" id="pw-success" style="display:none;"></div>
+          <button type="submit" class="btn-save">
+            <i class="fas fa-save"></i> Update Password
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </div><!-- end dash-main -->
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+  <script>
+    // Auth guard
+    if (sessionStorage.getItem('adminAuth') !== 'true') {
+      window.location.href = 'login.html';
+    }
+    document.getElementById('admin-name').textContent =
+      sessionStorage.getItem('adminName') || 'Admin';
+
+    // ===================== TABS =====================
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      document.querySelector(`[data-tab="${name}"]`)?.classList.add('active');
+      if (name === 'messages') renderMessages('all');
+      if (name === 'overview') renderOverview();
+      if (name === 'skills') renderSkills();
+      if (name === 'projects') renderProjects();
+    }
+
+    document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        switchTab(item.dataset.tab);
+      });
+    });
+
+    // Sidebar toggle
+    document.getElementById('sidebar-toggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    });
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', e => {
+      e.preventDefault();
+      sessionStorage.removeItem('adminAuth');
+      window.location.href = 'login.html';
+    });
+
+    // ===================== MESSAGES =====================
+    function getMessages() {
+      return JSON.parse(localStorage.getItem('cvMessages') || '[]');
+    }
+    function saveMessages(msgs) {
+      localStorage.setItem('cvMessages', JSON.stringify(msgs));
+    }
+
+    function renderOverview() {
+      const msgs = getMessages();
+      const unread = msgs.filter(m => !m.read).length;
+      document.getElementById('stat-total').textContent = msgs.length;
+      document.getElementById('stat-unread').textContent = unread;
+      document.getElementById('msg-badge').textContent = unread;
+      document.getElementById('notif-dot').style.display = unread > 0 ? 'block' : 'none';
+
+      const container = document.getElementById('recent-messages');
+      if (msgs.length === 0) {
+        container.innerHTML = '<p class="empty-state"><i class="fas fa-inbox"></i> No messages yet.</p>';
+        return;
+      }
+      const recent = msgs.slice(-5).reverse();
+      container.innerHTML = recent.map(m => `
+        <div class="msg-row ${m.read ? '' : 'unread'}" onclick="openMessage('${m.id}')">
+          <div class="msg-avatar">${m.name.charAt(0).toUpperCase()}</div>
+          <div class="msg-preview">
+            <strong>${m.name}</strong>
+            <span>${m.subject || '(No subject)'}</span>
+          </div>
+          <div class="msg-meta">
+            <small>${formatDate(m.time)}</small>
+            ${!m.read ? '<span class="dot-unread"></span>' : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    function renderMessages(filter) {
+      let msgs = getMessages();
+      if (filter === 'unread') msgs = msgs.filter(m => !m.read);
+      if (filter === 'read')   msgs = msgs.filter(m => m.read);
+      msgs = msgs.slice().reverse();
+
+      const container = document.getElementById('message-list');
+      if (msgs.length === 0) {
+        container.innerHTML = '<p class="empty-state"><i class="fas fa-inbox"></i> No messages found.</p>';
+        return;
+      }
+      container.innerHTML = msgs.map(m => `
+        <div class="msg-row ${m.read ? '' : 'unread'}" onclick="openMessage('${m.id}')">
+          <div class="msg-avatar">${m.name.charAt(0).toUpperCase()}</div>
+          <div class="msg-preview">
+            <strong>${m.name}</strong>
+            <span>${m.email}</span>
+            <p>${m.subject || '(No subject)'}</p>
+          </div>
+          <div class="msg-meta">
+            <small>${formatDate(m.time)}</small>
+            ${!m.read ? '<span class="dot-unread"></span>' : ''}
+          </div>
+        </div>`).join('');
+    }
+
+    function openMessage(id) {
+      const msgs = getMessages();
+      const idx  = msgs.findIndex(m => m.id === id);
+      if (idx === -1) return;
+      msgs[idx].read = true;
+      saveMessages(msgs);
+      const m = msgs[idx];
+
+      document.getElementById('detail-subject').textContent = m.subject || '(No subject)';
+      document.getElementById('detail-name').textContent    = m.name;
+      document.getElementById('detail-email').textContent   = m.email;
+      document.getElementById('detail-time').textContent    = formatDate(m.time);
+      document.getElementById('detail-body').textContent    = m.message;
+      document.getElementById('reply-btn').href =
+        `mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject || 'Your message')}&body=Hi ${m.name},%0D%0A%0D%0A`;
+      document.getElementById('delete-msg-btn').onclick = () => deleteMessage(id);
+      document.getElementById('message-detail').style.display = 'block';
+      renderMessages(currentFilter());
+      renderOverview();
+    }
+
+    function deleteMessage(id) {
+      let msgs = getMessages().filter(m => m.id !== id);
+      saveMessages(msgs);
+      document.getElementById('message-detail').style.display = 'none';
+      renderMessages(currentFilter());
+      renderOverview();
+      showToast('Message deleted.');
+    }
+
+    document.getElementById('close-detail').addEventListener('click', () => {
+      document.getElementById('message-detail').style.display = 'none';
+    });
+
+    document.getElementById('clear-all-btn').addEventListener('click', () => {
+      if (confirm('Delete ALL messages? This cannot be undone.')) {
+        saveMessages([]);
+        document.getElementById('message-detail').style.display = 'none';
+        renderMessages('all');
+        renderOverview();
+        showToast('All messages cleared.');
+      }
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderMessages(btn.dataset.filter);
+      });
+    });
+
+    function currentFilter() {
+      return document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    }
+
+    // ===================== PROFILE FORM =====================
+    document.getElementById('profile-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const data = {
+        name:      document.getElementById('p-name').value,
+        title:     document.getElementById('p-title').value,
+        email:     document.getElementById('p-email').value,
+        phone:     document.getElementById('p-phone').value,
+        location:  document.getElementById('p-location').value,
+        languages: document.getElementById('p-languages').value,
+        bio:       document.getElementById('p-bio').value,
+        linkedin:  document.getElementById('p-linkedin').value,
+        github:    document.getElementById('p-github').value,
+      };
+      localStorage.setItem('adminProfile', JSON.stringify(data));
+      const badge = document.getElementById('profile-saved');
+      badge.style.display = 'inline-flex';
+      setTimeout(() => badge.style.display = 'none', 3000);
+      showToast('Profile saved successfully!');
+    });
+
+    // Load saved profile
+    const savedProfile = JSON.parse(localStorage.getItem('adminProfile') || '{}');
+    if (savedProfile.name)      document.getElementById('p-name').value      = savedProfile.name;
+    if (savedProfile.title)     document.getElementById('p-title').value     = savedProfile.title;
+    if (savedProfile.email)     document.getElementById('p-email').value     = savedProfile.email;
+    if (savedProfile.phone)     document.getElementById('p-phone').value     = savedProfile.phone;
+    if (savedProfile.location)  document.getElementById('p-location').value  = savedProfile.location;
+    if (savedProfile.languages) document.getElementById('p-languages').value = savedProfile.languages;
+    if (savedProfile.bio)       document.getElementById('p-bio').value       = savedProfile.bio;
+    if (savedProfile.linkedin)  document.getElementById('p-linkedin').value  = savedProfile.linkedin;
+    if (savedProfile.github)    document.getElementById('p-github').value    = savedProfile.github;
+
+    // ===================== SKILLS =====================
+    function getSkills() {
+      return JSON.parse(localStorage.getItem('adminSkills') || '[]');
+    }
+    function saveSkills(s) { localStorage.setItem('adminSkills', JSON.stringify(s)); }
+
+    function renderSkills() {
+      const skills = getSkills();
+      const container = document.getElementById('skills-list');
+      if (skills.length === 0) {
+        container.innerHTML = '<p class="empty-state">No custom skills added yet.</p>';
+        return;
+      }
+      container.innerHTML = skills.map((s, i) => `
+        <div class="list-row">
+          <div class="list-info">
+            <strong>${s.name}</strong>
+            <span>${s.category} — ${s.level}%</span>
+          </div>
+          <div class="skill-bar-mini">
+            <div style="width:${s.level}%"></div>
+          </div>
+          <button class="btn-icon-danger" onclick="deleteSkill(${i})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>`).join('');
+    }
+
+    document.getElementById('skill-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const skills = getSkills();
+      skills.push({
+        name:     document.getElementById('skill-name').value.trim(),
+        category: document.getElementById('skill-cat').value,
+        level:    parseInt(document.getElementById('skill-level').value),
+      });
+      saveSkills(skills);
+      e.target.reset();
+      renderSkills();
+      showToast('Skill added!');
+    });
+
+    function deleteSkill(i) {
+      const skills = getSkills();
+      skills.splice(i, 1);
+      saveSkills(skills);
+      renderSkills();
+      showToast('Skill removed.');
+    }
+
+    // ===================== PROJECTS =====================
+    function getProjects() {
+      return JSON.parse(localStorage.getItem('adminProjects') || '[]');
+    }
+    function saveProjects(p) { localStorage.setItem('adminProjects', JSON.stringify(p)); }
+
+    function renderProjects() {
+      const projects = getProjects();
+      const container = document.getElementById('projects-list');
+      if (projects.length === 0) {
+        container.innerHTML = '<p class="empty-state">No custom projects added yet.</p>';
+        return;
+      }
+      container.innerHTML = projects.map((p, i) => `
+        <div class="list-row">
+          <div class="proj-icon-sm"><i class="${p.icon || 'fas fa-code'}"></i></div>
+          <div class="list-info">
+            <strong>${p.title}</strong>
+            <span>${p.tech}</span>
+            <p>${p.desc}</p>
+          </div>
+          <button class="btn-icon-danger" onclick="deleteProject(${i})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>`).join('');
+    }
+
+    document.getElementById('project-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const projects = getProjects();
+      projects.push({
+        title: document.getElementById('proj-title').value.trim(),
+        icon:  document.getElementById('proj-icon').value.trim() || 'fas fa-code',
+        desc:  document.getElementById('proj-desc').value.trim(),
+        tech:  document.getElementById('proj-tech').value.trim(),
+      });
+      saveProjects(projects);
+      e.target.reset();
+      renderProjects();
+      showToast('Project added!');
+    });
+
+    function deleteProject(i) {
+      const projects = getProjects();
+      projects.splice(i, 1);
+      saveProjects(projects);
+      renderProjects();
+      showToast('Project removed.');
+    }
+
+    // ===================== CHANGE PASSWORD =====================
+    const newPassInput = document.getElementById('new-pass');
+    newPassInput.addEventListener('input', () => {
+      const val = newPassInput.value;
+      const strength = document.getElementById('pw-strength');
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['', '#e74c3c', '#f39c12', '#3498db', '#27ae60'];
+      strength.textContent = val ? `Strength: ${labels[score]}` : '';
+      strength.style.color = colors[score];
+    });
+
+    document.getElementById('password-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const cur     = document.getElementById('cur-pass').value;
+      const newP    = document.getElementById('new-pass').value;
+      const confirm = document.getElementById('confirm-pass').value;
+      const errEl   = document.getElementById('pw-error');
+      const sucEl   = document.getElementById('pw-success');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+
+      const storedPass = localStorage.getItem('adminPassword') || 'raymond123';
+      if (cur !== storedPass) {
+        errEl.textContent = 'Current password is incorrect.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (newP.length < 8 || !/[A-Z]/.test(newP) || !/[0-9]/.test(newP)) {
+        errEl.textContent = 'New password must be at least 8 characters with 1 uppercase and 1 number.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (newP !== confirm) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.style.display = 'block';
+        return;
+      }
+      localStorage.setItem('adminPassword', newP);
+      sucEl.textContent = '✓ Password updated successfully!';
+      sucEl.style.display = 'block';
+      e.target.reset();
+      showToast('Password changed!');
+    });
+
+    // ===================== TOAST =====================
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ===================== HELPERS =====================
+    function formatDate(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      return d.toLocaleDateString('en-KE', { day:'2-digit', month:'short', year:'numeric' }) +
+             ' ' + d.toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit' });
+    }
+
+    // Bell notification click
+    document.getElementById('notif-bell').addEventListener('click', () => switchTab('messages'));
+
+    // Initial render
+    renderOverview();
+  </script>
+</body>
+</html>
